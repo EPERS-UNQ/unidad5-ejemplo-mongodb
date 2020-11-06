@@ -13,36 +13,11 @@ import org.bson.codecs.pojo.PojoCodecProvider
  * "The MongoClient instance actually represents a pool of connections to the database;
  * you will only need one instance of class MongoClient even with multiple threads."
  *
- * This singleton ensures that only one instance of MongoClient ever exists
  */
 class MongoConnection {
     var client:MongoClient
     var dataBase: MongoDatabase
-    var session:ClientSession? = null
 
-    fun startTransaction() {
-        try {
-            session = client.startSession()
-            session?.startTransaction(TransactionOptions.builder().writeConcern(WriteConcern.MAJORITY).build())
-        }catch (exception: MongoClientException){
-            exception.printStackTrace()
-        }
-    }
-
-    fun commitTransaction() {
-        session?.commitTransaction()
-        closeSession()
-    }
-
-    fun rollbackTransaction() {
-        session?.abortTransaction()
-        closeSession()
-    }
-
-    protected fun closeSession(){
-        session?.close()
-        session = null
-    }
 
     fun <T> getCollection(name:String, entityType: Class<T> ): MongoCollection<T> {
         try{
@@ -59,12 +34,13 @@ class MongoConnection {
             CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build())
         )
         val uri = System.getenv().getOrDefault("MONGO_URI", "mongodb://localhost:27017")
+        val database = System.getenv().getOrDefault("MONGO_DB", "epersMongo")
         val connectionString = ConnectionString(uri)
         val settings = MongoClientSettings.builder()
             .codecRegistry(codecRegistry)
             .applyConnectionString(connectionString)
             .build()
         client = MongoClients.create(settings)
-        dataBase = client.getDatabase("epersMongo")
+        dataBase = client.getDatabase(database)
     }
 }

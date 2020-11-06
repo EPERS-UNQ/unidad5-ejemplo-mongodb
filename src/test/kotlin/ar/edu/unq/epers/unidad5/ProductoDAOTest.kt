@@ -44,9 +44,7 @@ class ProductoDAOTest {
                 })
             })
         }
-        dao.startTransaction()
         dao.save(productos)
-        dao.commit()
     }
 
     @After
@@ -62,10 +60,8 @@ class ProductoDAOTest {
         val producto = Producto("0001", "Longboard", "Santa Cruz")
         producto.addPrecio(Precio(zonaUS, user, 78, producto))
         producto.addPrecio(Precio(zonaUK, user, 82, producto))
-        dao.startTransaction()
         dao.save(producto)
         val producto2 = dao.getByCode(producto.codigo)
-        dao.commit()
         Assert.assertEquals("0001", producto2!!.codigo)
         Assert.assertEquals("Longboard", producto2.nombre)
         Assert.assertEquals("Santa Cruz", producto2.marca)
@@ -122,13 +118,11 @@ class ProductoDAOTest {
         val producto1 = Producto("0001", "Longboard", "Santa Cruz")
         producto1.addPrecio(Precio(zonaUS, user, 78, producto1))
         producto1.addPrecio(Precio(zonaUK, user, 82, producto1))
-        dao.startTransaction()
         dao.save(producto1)
         val producto2 = Producto("0002", "Skateboard", "Santa Cruz")
         producto2.addPrecio(Precio(zonaUS, user, 60, producto2))
         producto2.addPrecio(Precio(zonaUK, user, 62, producto2))
         dao.save(producto2)
-        dao.commit()
         val productos = dao.getPorPrecioEnZona(80, zonaUK)
         Assert.assertEquals("Solo el Skateboard es mas barato en que 80 en UK", 1, productos.size.toLong())
     }

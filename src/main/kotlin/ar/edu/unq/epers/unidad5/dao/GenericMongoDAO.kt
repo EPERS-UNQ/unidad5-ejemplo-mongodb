@@ -14,11 +14,7 @@ open class GenericMongoDAO<T>(entityType: Class<T>) {
     }
 
     fun deleteAll() {
-        if(connection.session != null) {
-            collection.drop(connection.session!!)
-        }else{
-            collection.drop()
-        }
+        collection.drop()
     }
 
     fun save(anObject: T) {
@@ -26,20 +22,11 @@ open class GenericMongoDAO<T>(entityType: Class<T>) {
     }
 
     fun update(anObject: T, id: String?) {
-        if(connection.session != null) {
-            collection.replaceOne(connection.session!!, eq("id", id), anObject)
-        }else{
-            collection.replaceOne(eq("id", id), anObject)
-        }
+        collection.replaceOne(eq("id", id), anObject)
     }
 
     fun save(objects: List<T>) {
-        if(connection.session != null) {
-            collection.insertMany(connection.session!!, objects)
-        }else{
-            collection.insertMany(objects)
-        }
-
+        collection.insertMany(objects)
     }
 
     operator fun get(id: String?): T? {
@@ -47,9 +34,6 @@ open class GenericMongoDAO<T>(entityType: Class<T>) {
     }
 
     fun getBy(property:String, value: String?): T? {
-        if(connection.session != null) {
-            return collection.find(connection.session!!, eq(property, value)).first()
-        }
         return collection.find(eq(property, value)).first()
     }
 
@@ -58,29 +42,12 @@ open class GenericMongoDAO<T>(entityType: Class<T>) {
     }
 
     fun find(filter:Bson): List<T> {
-        if(connection.session != null) {
-            return collection.find(connection.session!!, filter).into(mutableListOf())
-        }
         return collection.find(filter).into(mutableListOf())
     }
 
     fun <T> aggregate(pipeline:List<Bson> , resultClass:Class<T>): List<T> {
-        if(connection.session != null) {
-            return collection.aggregate(connection.session, pipeline, resultClass).into(ArrayList())
-        }
         return collection.aggregate(pipeline, resultClass).into(ArrayList())
     }
 
-    fun startTransaction(){
-        connection.startTransaction()
-    }
-
-    fun commit(){
-        connection.commitTransaction()
-    }
-
-    fun rollack(){
-        connection.rollbackTransaction()
-    }
 
 }
