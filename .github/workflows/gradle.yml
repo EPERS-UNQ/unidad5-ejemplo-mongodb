@@ -30,6 +30,7 @@ jobs:
         run: ./gradlew test -i
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
+          MONGO_DB: ${{ secrets.MONGO_DB }}
       - name: Success notification
         if: success()
         env:
